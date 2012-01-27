@@ -1,0 +1,67 @@
+global proc initializeGUI()
+  {
+  int $width= 400;
+  int $height= 250;
+  string $title = "Unity Grid Converter v1.01";
+    //Create Window
+  	if(`window -q -exists $title`){
+  		deleteUI $title;
+  	}
+  
+    string $win= `window -w $width -h $height -title $title`;
+  
+    columnLayout;
+  
+    button -l "Set Grid to Meters" -c "GridSetup" -w $width;
+    button -l "Reference (size of Unity's Default Charactor)" -c "CreatePerson" -w $width;
+    button -l "Center Selected Veticies to X" -c "CenterVertsX" -w $width;
+    button -l "Center Object (or vertex) to (0,0,0)" -c "Center" -w $width;
+
+    string $formTest = `formLayout`;
+  	showWindow $win;
+  }
+  
+  global proc printPrefName (string $GlobalPrefName) {
+      print $GlobalPrefName;
+  
+  }
+
+global proc GridSetup(){
+	
+	$response = `confirmDialog 
+		-title "Confirm" 
+		-message "Your Maya settings will be converted to Meters" 
+		-button "Continue" 
+		-button "Cancel" 
+		-defaultButton "Continue" 
+		-cancelButton "Cancel" 
+		-dismissString "Cancel"`;
+			
+	if( $response == "Continue" ){
+		currentUnit -linear "m";
+		setAttr "perspShape.farClipPlane" 10000;
+    	setAttr "perspShape.nearClipPlane" 0.1;
+    	grid 
+		    -size 10
+		    -spacing 1 
+		    -divisions 1;
+		viewSet -animate `optionVar -query animateRollViewCompass` -home;
+		print ("Maya scale set to Meters \n");
+    }
+}
+
+global proc CreatePerson(){
+    polyCube -w 1.2 -h 1.82 -d 1.2 -n personReference ;
+	move 0 0.91 0;
+    xform -pivots 0 -0.91 0 ; 
+}
+
+global proc CenterVertsX(){
+    move -x -a 0;
+}
+
+global proc Center(){
+    move -a 0 0 0;
+}
+  
+initializeGUI;
